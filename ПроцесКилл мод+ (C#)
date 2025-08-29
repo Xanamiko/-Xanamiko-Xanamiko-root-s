@@ -1,0 +1,19 @@
+using System;
+using System.Management;
+
+public class ForceKillProcess
+{
+    public static void KillByName(string processName)
+    {
+        string query = $"SELECT * FROM Win32_Process WHERE Name = '{processName}'";
+
+        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
+        {
+            foreach (ManagementObject process in searcher.Get())
+            {
+                process.InvokeMethod("Terminate", null);
+                Console.WriteLine($"Процесс {processName} завершён через WMI.");
+            }
+        }
+    }
+}
