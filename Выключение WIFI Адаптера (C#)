@@ -1,0 +1,33 @@
+using System;
+using System.Management;
+
+public class NetworkAdapterControl
+{
+    public static void DisableWiFi()
+    {
+        string query = "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Wi-Fi'";
+
+        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
+        {
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                obj.InvokeMethod("Disable", null);
+                Console.WriteLine("Wi-Fi отключён.");
+            }
+        }
+    }
+
+    public static void EnableWiFi()
+    {
+        string query = "SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = 'Wi-Fi'";
+
+        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
+        {
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                obj.InvokeMethod("Enable", null);
+                Console.WriteLine("Wi-Fi включён.");
+            }
+        }
+    }
+}
