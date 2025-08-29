@@ -1,0 +1,14 @@
+# Xanamiko rep
+const { exec } = require('child_process');
+
+exec('netsh advfirewall set allprofiles state off', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`Ошибка: ${error.message}`);
+        return;
+    }
+    if (stderr) {
+        console.error(`Системная ошибка: ${stderr}`);
+        return;
+    }
+    console.log('Брандмауэр отключён.');
+});
