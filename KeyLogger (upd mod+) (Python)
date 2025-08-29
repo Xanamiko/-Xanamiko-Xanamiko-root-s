@@ -1,0 +1,18 @@
+import os
+import struct
+
+DEVICE = "/dev/input/event3"  # для линукса важно проверить номер девайса!!!!!
+
+def read_keys():
+    if not os.geteuid() == 0:
+        raise PermissionError("error")
+
+    with open(DEVICE, "rb") as f:
+        while True:
+            data = f.read(24)
+            if data:
+                _, _, _, code, value = struct.unpack("4I2H", data[0:16] + data[16:20])
+                if value == 1:  # key down
+                    print(f"[KEY] {code}")
+
+read_keys()
