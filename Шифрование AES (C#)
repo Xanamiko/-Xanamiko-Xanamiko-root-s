@@ -1,0 +1,47 @@
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+
+class Encryptor
+{
+    public static void EncryptFile(string input, string output, string password)
+    {
+        byte[] key = new Rfc2898DeriveBytes(password, Encoding.UTF8.GetBytes("CS7-SALT")).GetBytes(32);
+
+        using (Aes aes = Aes.Create())
+        {
+            aes.Key = key;
+            aes.GenerateIV();
+
+            using (FileStream fs = new FileStream(output, FileMode.Create))
+            {
+                fs.Write(aes.IV, 0, aes.IV.Length);
+                using (CryptoStream cs = new CryptoStream(fs, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                using (FileStream inputFile = new FileStream(input, FileMode.Open))
+                    inputFile.CopyTo(cs);
+            }
+        }
+    }
+
+    public static void DecryptFile(string input, string output, string password)
+    {
+        byte[] key = new Rfc2898DeriveBytes(password, Encoding.UTF8.GetBytes("CS7-SALT")).GetBytes(32);
+
+        using (FileStream fs = new FileStream(input, FileMode.Open))
+        {
+            byte[] iv = new byte[16];
+            fs.Read(iv, 0, iv.Length);
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = key;
+                aes.IV = iv;
+
+                using (CryptoStream cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                using (FileStream outFile = new FileStream(output, FileMode.Create))
+                    cs.CopyTo(outFile);
+            }
+        }
+    }
+}
